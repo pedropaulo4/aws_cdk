@@ -16,8 +16,15 @@ public class CursoAwsCdkApp {
         // Adcionando a dependencia da vpc para criar o cluster
         clusterStack.addDependency(vpcStack);
 
-        Service01Stack service01Stack = new Service01Stack(app, "Service01", clusterStack.getCluster());
+        RdsStack rdsStack = new RdsStack(app, "Rds", vpcStack.getVpc());
+        rdsStack.addDependency(vpcStack);
+
+        SnsStack snsStack = new SnsStack(app, "Sns");
+
+        Service01Stack service01Stack = new Service01Stack(app, "Service01", clusterStack.getCluster(),snsStack.getProductEventsTopic());
         service01Stack.addDependency(clusterStack);
+        service01Stack.addDependency(rdsStack);
+        service01Stack.addDependency(snsStack);
 
         app.synth();
     }
